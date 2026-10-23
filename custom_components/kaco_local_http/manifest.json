@@ -2,7 +2,7 @@
   "domain": "kaco_local_http",
   "name": "KACO Local HTTP",
   "version": "2026.10.1",
-  "documentation": "https://github.com/hssteuerungkaco-local-http#readme",
+  "documentation": "https://github.com/hssteuerung/kaco-local-http#readme",
   "requirements": [],
   "dependencies": [],
   "codeowners": [],
