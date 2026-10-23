@@ -34,7 +34,7 @@ Bisher anhand eines **blueplanet 3.0 NX1 M2 / M11 / Firmware 21618-006R** erprob
 
 1. Dieses Repository in GitHub veröffentlichen.
 2. In Home Assistant **HACS → Drei-Punkte-Menü → Benutzerdefinierte Repositories** öffnen.
-3. Repository-URL `https://github.com/DEIN-BENUTZERNAME/kaco-local-http` eintragen, Typ **Integration** wählen und hinzufügen.
+3. Repository-URL `https://github.com/hssteuerung/kaco-local-http` eintragen, Typ **Integration** wählen und hinzufügen.
 4. **KACO Local HTTP** in HACS installieren.
 5. Home Assistant neu starten.
 6. Unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** nach **KACO Local HTTP** suchen.
