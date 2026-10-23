@@ -65,15 +65,6 @@ Den Ordner `custom_components/kaco_local_http` aus diesem Repository nach `/conf
 | Verbindung | HTTP-Erreichbarkeit | Online / Offline |
 | Letzte erfolgreiche Aktualisierung | lokaler Zeitstempel | Datum/Uhrzeit |
 
-Die Umrechnungen außer `eto` wurden nicht alle unabhängig validiert. Vor Einsatz für Abrechnung oder Steuerung mit der Original-App vergleichen.
-
-## Energiedashboard
-
-Der Sensor **Gesamtertrag Wechselrichter** ist als `energy`, `total_increasing`, `kWh` deklariert. Wenn frühere Versionen denselben Sensor mit falscher Einheit/Skalierung aufgezeichnet haben, unter **Entwicklerwerkzeuge → Statistik** vorhandene Langzeitstatistiken prüfen und gegebenenfalls korrigieren, bevor der Sensor als Solarproduktion verwendet wird.
-
-## Logo und Branding
-
-Die Dateien `logo.png`, `logo@2x.png`, `icon.png` und `icon@2x.png` liegen im Integrationsordner. **Home Assistant zeigt lokale Bilder nicht automatisch als Integrationslogo in „Geräte & Dienste“ an.** Dafür kann ein gesonderter Eintrag im Home-Assistant-Brands-Projekt erforderlich sein. Die Dateien sind zunächst als Branding-Assets enthalten.
 
 ## Datenschutz und Sicherheit
 
