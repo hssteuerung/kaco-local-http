@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "KACO lokal verbinden",
+        "description": "Lokale HTTP-Verbindung zum KACO WLAN-Stick",
+        "data": {
+          "host": "IP-Adresse",
+          "port": "HTTP-Port"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen. IP und Port prüfen.",
+      "no_inverter": "Kein Wechselrichter gefunden."
+    },
+    "abort": {
+      "already_configured": "Dieser Wechselrichter ist bereits eingerichtet."
+    }
+  }
+}

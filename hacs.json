@@ -1,0 +1,5 @@
+{
+  "name": "KACO Local HTTP",
+  "render_readme": true,
+  "homeassistant": "2024.6.0"
+}

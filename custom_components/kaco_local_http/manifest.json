@@ -1,0 +1,12 @@
+{
+  "domain": "kaco_local_http",
+  "name": "KACO Local HTTP",
+  "version": "2026.10.1",
+  "documentation": "https://github.com/DEIN-BENUTZERNAME/kaco-local-http#readme",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": [],
+  "config_flow": true,
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/DEIN-BENUTZERNAME/kaco-local-http/issues"
+}

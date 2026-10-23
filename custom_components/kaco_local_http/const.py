@@ -1,0 +1,3 @@
+DOMAIN = "kaco_local_http"
+DEFAULT_HOST = "10.20.30.170"
+DEFAULT_PORT = 8484
