@@ -37,7 +37,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 data = await response.json(content_type=None)
                 if not isinstance(data, dict) or "pac" not in data:
                     raise UpdateFailed("Ungültige Messdaten")
-                now = datetime.now(timezone.utc)
+                # Device metadata comes from a second confirmed local endpoint.
+                # A failure here must not invalidate valid live measurements.
+                try:
+                    async with session.get(f"http://{host}:{port}/getdev.cgi?device=2") as info_response:
+                        info_response.raise_for_status()
+                        info = await info_response.json(content_type=None)
+                        inverters = info.get("inv") if isinstance(info, dict) else None
+                        if isinstance(inverters, list):
+                            match = next((item for item in inverters if isinstance(item, dict) and item.get("isn") == serial), None)
+                            if match:
+                                data.update({k: match[k] for k in ("add", "safety", "rate", "mty", "psb_eb") if k in match})
+                except (aiohttp.ClientError, TimeoutError, ValueError, TypeError) as metadata_err:
+                    _LOGGER.debug("KACO-Geräteinformationen nicht erreichbar: %s", metadata_err)
+                    data.update({k: last_data[k] for k in ("add", "safety", "rate", "mty", "psb_eb") if k in last_data})
                 status["online"] = True
                 status["last_success"] = datetime.now(timezone.utc)
                 last_data = data
