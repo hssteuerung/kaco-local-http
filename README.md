@@ -4,7 +4,8 @@
 
 ![KACO LOCAL Logo](custom_components/kaco_local_http/logo.png)
 
-**Version:** `2026.10.1` · **Status:** erste GitHub-Veröffentlichung, noch nicht vollständig auf unterschiedlichen Geräten getestet · **Sprache:** Deutsch
+**Status:** erste GitHub-Veröffentlichung, noch nicht vollständig auf unterschiedlichen Geräten getestet · 
+**Sprache:** Deutsch
 
 > Unabhängiges Community-Projekt. Keine offizielle Integration von KACO. KACO und zugehörige Marken sind Eigentum der jeweiligen Rechteinhaber. Das gestaltete Logo ist ein Community-Motiv und keine offizielle Freigabe durch KACO.
 
@@ -13,9 +14,8 @@
 - Lokale HTTP-Abfrage ohne Cloud über die M11-Kommunikationseinheit (standardmäßig Port `8484`).
 - Konfiguration über **Einstellungen → Geräte & Dienste → Integration hinzufügen**.
 - Sensoren für AC-Leistung, Scheinleistung, Netzspannung, Netzstrom, Netzfrequenz, Temperatur, Fehlercode, Status-Rohwert sowie PV1/PV2-Spannung und -Strom.
-- Originaler Gesamtertrag `eto / 10` in **kWh** (gegen KACO-App abgeglichen).
-- Tagesertrag `etd` zunächst **als Rohwert**, da seine Skalierung noch nicht bestätigt ist.
-- Bei Offline-Verbindung **0 W** für AC-Leistung und **0 VA** für Scheinleistung als *Ersatzwert*; andere Sensoren behalten den letzten empfangenen Wert.
+- Originaler Gesamtertrag
+- Tagesertrag 
 - Zwischenspeicherung der zuletzt erfolgreichen Messdaten und Wiederherstellung nach Home-Assistant-Neustart, sobald mindestens eine Messung gespeichert wurde.
 - Sensoren für Verbindungsstatus und letzte erfolgreiche Aktualisierung.
 
@@ -61,19 +61,11 @@ Den Ordner `custom_components/kaco_local_http` aus diesem Repository nach `/conf
 | PV1 / PV2 Spannung | `vpv[0/1]` | `/10` V |
 | PV1 / PV2 Strom | `ipv[0/1]` | `/100` A |
 | Fehlercode | `err` | Rohwert |
-| Status-Rohwert | `flg` | Rohwert |
 | Verbindung | HTTP-Erreichbarkeit | Online / Offline |
 | Letzte erfolgreiche Aktualisierung | lokaler Zeitstempel | Datum/Uhrzeit |
 
 Die Umrechnungen außer `eto` wurden nicht alle unabhängig validiert. Vor Einsatz für Abrechnung oder Steuerung mit der Original-App vergleichen.
 
-## Energiedashboard
-
-Der Sensor **Gesamtertrag Wechselrichter** ist als `energy`, `total_increasing`, `kWh` deklariert. Wenn frühere Versionen denselben Sensor mit falscher Einheit/Skalierung aufgezeichnet haben, unter **Entwicklerwerkzeuge → Statistik** vorhandene Langzeitstatistiken prüfen und gegebenenfalls korrigieren, bevor der Sensor als Solarproduktion verwendet wird.
-
-## Logo und Branding
-
-Die Dateien `logo.png`, `logo@2x.png`, `icon.png` und `icon@2x.png` liegen im Integrationsordner. **Home Assistant zeigt lokale Bilder nicht automatisch als Integrationslogo in „Geräte & Dienste“ an.** Dafür kann ein gesonderter Eintrag im Home-Assistant-Brands-Projekt erforderlich sein. Die Dateien sind zunächst als Branding-Assets enthalten.
 
 ## Datenschutz und Sicherheit
 
@@ -93,7 +85,3 @@ Fehlerberichte bitte mit Home-Assistant-Version, KACO-Modell, M11-Firmware, repr
 ## Lizenz
 
 Quellcode unter der [MIT-Lizenz](LICENSE). Marken- und Logo-Rechte bleiben bei den jeweiligen Inhabern; die Lizenz stellt keine Markenfreigabe dar.
-
-### Energiezähler
-
-Der Tagesertrag (`etd`) und der Gesamtertrag (`eto`) werden mit dem anhand der KACO-App geprüften Faktor 0,1 in kWh angezeigt. Bei Verbindungsverlust bleibt der letzte Ertragswert erhalten.
