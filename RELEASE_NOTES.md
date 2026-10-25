@@ -1,3 +1,8 @@
+## 2026.10.2
+
+- Tagesertrag (`etd`) wird jetzt durch 10 geteilt und als kWh-Energiesensor ausgegeben.
+- Bisherige Funktionen und Branding bleiben erhalten.
+
 # KACO Local HTTP 2026.10.1
 
 Erste GitHub-Veröffentlichung der lokalen Home-Assistant-Integration für KACO blueplanet NX1 M2 mit M11-WLAN-Modul.

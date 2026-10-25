@@ -1,3 +1,8 @@
+## 2026.10.2
+
+- Tagesertrag (`etd`) wird jetzt durch 10 geteilt und als kWh-Energiesensor ausgegeben.
+- Bisherige Funktionen und Branding bleiben erhalten.
+
 # Änderungsprotokoll
 
 ## 2026.10.1 – Erste GitHub-Version (2026-10-23)

@@ -13,7 +13,7 @@ DESCRIPTIONS = [
     ('sac','Scheinleistung','VA',SensorDeviceClass.APPARENT_POWER,SensorStateClass.MEASUREMENT,1),
     ('err','Fehlercode',None,None,None,1),
     ('flg','Status-Rohwert',None,None,None,1),
-    ('etd','Tagesertrag Rohwert',None,None,None,1),
+    ('etd','Tagesertrag','kWh',SensorDeviceClass.ENERGY,SensorStateClass.TOTAL_INCREASING,0.1),
     ('eto','Gesamtertrag Wechselrichter','kWh',SensorDeviceClass.ENERGY,SensorStateClass.TOTAL_INCREASING,0.1),
     ('vpv0','PV1 Spannung','V',SensorDeviceClass.VOLTAGE,SensorStateClass.MEASUREMENT,0.1),
     ('vpv1','PV2 Spannung','V',SensorDeviceClass.VOLTAGE,SensorStateClass.MEASUREMENT,0.1),
@@ -63,7 +63,7 @@ class KacoSensor(CoordinatorEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         return {
-            **({"umrechnung": "Originalwert eto / 10; mit KACO-App abgeglichen"} if self.key == "eto" else {}),
+            **({"umrechnung": "Originalwert / 10; Tages- und Gesamtertrag mit KACO-App abgeglichen"} if self.key in ("eto", "etd") else {}),
             "messwert_status": ("aktuell" if self.status["online"] else
                 ("Ersatzwert 0 (offline)" if self.key in ("pac", "sac") else "letzter empfangener Wert")),
             "original_http_feld": self.key,
