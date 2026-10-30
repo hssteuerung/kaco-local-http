@@ -1,57 +1,29 @@
-# Changelog – KACO Local HTTP
+# Changelog
 
-Alle Änderungen an der veröffentlichten GitHub-/HACS-Reihe. Diese Version bündelt die bisherigen Änderungen und ersetzt den bisherigen Pre-Release-Stand `2026.10.2`.
+## 2026.10.3 – NX1-/NX3-Unterstützung (Testversion)
 
-## [2026.10.2] – Stabile Veröffentlichung: Sensoren, Diagnose und verständliche Werte
-
-### Hinzugefügt
-
-- Entitäten in Home Assistant nach **Sensoren** und **Diagnose** aufgeteilt (`entity_category: diagnostic` für technische Informationen).
-- **Blindleistung** (`qac`) wieder als Messsensor mit Einheit **var** hinzugefügt.
-- **Leistungsfaktor** (`pf`) als Messsensor: Umrechnung `/100`, zum Beispiel `99` → `0,99`.
-- **Betriebsstunden** (`hto`) als Sensor in **h**; Originalwert ohne Umrechnung, mit KACO-App abgeglichen.
-- Diagnose **Peak Shaving / Erweiterung** (`psb_eb`) mit unverändertem Originalwert und vorsichtiger Beschreibung der noch nicht abschließend verifizierten Bedeutung.
-- Übersetzung bekannter **Ländercodes / Netzstandards** (`safety`), z. B. `70` → `VDE-AR-N 4105 (Deutschland)`.
-- Übersetzung bekannter **Modelltypcodes** (`mty`), z. B. `49` → `blueplanet 3.0 NX1`; weitere NX1-/NX3-Zuordnungen hinterlegt, ohne eine Gerätekompatibilität zu garantieren.
-
-### Geändert
-
-- Nennleistung, Fehlercode, Geräteadresse, Ländercode, Modelltyp, Peak-Shaving-Feld, Verbindungsstatus und Zeitstempel der letzten erfolgreichen Aktualisierung unter **Diagnose** eingeordnet.
-- Betriebsstunden nicht mehr als „Rohwert“ bezeichnet.
-- Diagnosewerte behalten ihre ursprünglichen HTTP-Codes in Attributen, wo für die Zuordnung hilfreich.
-- Dokumentation für den aktuellen Sensorumfang, die Skalierungen und das Offline-Verhalten aktualisiert.
-
-### Entfernt
-
-- Eigenständige Diagnose-Entität **Status-Rohwert** (`flg`). Das separate Feld `psb_eb` bleibt erhalten; beide Felder sind nicht gleichbedeutend.
-
-### Unverändert
-
-- Lokale HTTP-Kommunikation über M11/Port 8484 ohne Cloud.
-- Offline-Ersatzwert **0 W** für AC-Leistung und **0 VA** für Scheinleistung; übrige Messwerte behalten den letzten erfolgreichen Stand.
-- Keine berechnete oder geschätzte PV-String-Leistung beziehungsweise getrennte String-Erträge.
-- KACO-LOCAL-Community-Branding und GitHub-/HACS-Paketstruktur.
-
-### Weitere Korrektur: Tagesertrag
+### Neu
+- Modellname aus dem Seriennummernpräfix (`isn`) abgeleitet; NX1 und NX3 werden unterschieden.
+- Für dreiphasige Geräte zusätzliche Sensoren **Netzspannung L2/L3** und **Netzstrom L2/L3**, sofern die HTTP-Daten bei der Einrichtung drei Phasen enthalten.
+- `mty` bleibt als Diagnose-Attribut `originalcode` sichtbar, wird aber nicht mehr über eine widersprüchliche Modellcode-Tabelle übersetzt.
 
 ### Behoben
+- Ein blueplanet 20.0 NX3 M2 mit `mty: 51` wird nicht mehr fälschlich als blueplanet 4.0 NX1 angezeigt.
+- Geräteinformationen zeigen nicht mehr pauschal „blueplanet NX1 M2“.
 
-- **Tagesertrag** (`etd`) nicht mehr als unskalierter Rohwert: Umrechnung `etd / 10` und Anzeige in **kWh**.
-- Tagesertrag als Energie-Entität mit passender Home-Assistant-Sensorklassifizierung geführt.
+### Kompatibilität
+- Bestehende Entitäts-IDs für Netzspannung/Netzstrom L1 bleiben unverändert.
+- Die bekannten Sensoren, Diagnosewerte, das Offline-Verhalten und die Ertragsumrechnung bleiben bestehen.
+- NX3-Testwerte für die Netzstromskalierung sind noch zu validieren.
 
-### Unverändert
+## 2026.10.2 – Reguläres Release
 
-- **Gesamtertrag** (`eto / 10` kWh), bereits mit der KACO-App abgeglichen.
-- Lokale HTTP-Abfrage, Speicherung letzter gültiger Messwerte, Verbindungsdiagnose und Community-Branding.
+- Lokale M11-HTTP-Abfrage und HACS-Installation.
+- Tages- und Gesamtertrag `/10` in kWh; Leistungsfaktor `/100`.
+- Betriebsstunden in `h` ohne Umrechnung.
+- Blindleistung und Scheinleistung als Sensoren.
+- Trennung von Sensoren und Diagnose einschließlich Ländercode und Erweiterungsstatus.
+- Offline-Ersatzwert 0 W für AC-Leistung und Speicherung zuletzt erfolgreicher Daten.
+- KACO-LOCAL-Branding und GitHub-Dokumentation.
 
-## [2026.10.1] – Erste GitHub-Veröffentlichung
-
-- Home-Assistant-Custom-Integration für KACO blueplanet NX1 M2 mit M11-WLAN-Kommunikationseinheit.
-- Lokale HTTP-Abfrage über Port `8484`, deutscher Einrichtungsdialog.
-- Messsensoren für AC-Leistung, Scheinleistung, Netzwerte, PV-String-Spannung/-Strom und Temperatur.
-- Gesamtertrag `eto / 10` kWh, anhand der KACO-App geprüft.
-- Offline-Ersatzwerte für momentane Leistung, Zwischenspeicherung zuletzt gültiger Daten und Wiederherstellung nach Neustart.
-- Verbindungsstatus und Zeitstempel der letzten erfolgreichen Abfrage.
-- Community-Logo sowie GitHub-/HACS-Dateien und grundlegende Dokumentation.
-
-> **Kompatibilität:** Bisher anhand eines blueplanet 3.0 NX1 M2 mit M11-Firmware 21618-006R erprobt. Andere Modelle und Firmwareversionen sind nicht bestätigt. Nicht alle elektrischen Skalierungen sind unabhängig validiert.
+> Die Version 2026.10.2 bleibt als veröffentlichter Stand unverändert. 2026.10.3 ist die nächste Testversion.

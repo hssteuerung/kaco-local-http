@@ -1,51 +1,48 @@
 # KACO Local HTTP
 
-**Lokale Home-Assistant-Integration für KACO blueplanet NX1 M2 mit M11-WLAN-Kommunikationseinheit.**
+**Lokale Home-Assistant-Integration für KACO blueplanet NX1 M2 und NX3 M2 mit M11-WLAN-Kommunikationseinheit.**
 
 ![KACO LOCAL Logo](custom_components/kaco_local_http/brand/logo.png)
 
-**Status:** Community-Projekt; noch nicht vollständig auf unterschiedlichen Geräten getestet  
-**Sprache:** Deutsch  
-**Aktuelle Version:** `2026.10.2`
+**Status:** Community-Projekt, NX1 erprobt; NX3-Unterstützung in Version 2026.10.3 zum Praxistest.  
+**Sprache:** Deutsch
 
-> Unabhängiges Community-Projekt. Keine offizielle Integration von KACO. KACO und zugehörige Marken sind Eigentum der jeweiligen Rechteinhaber. Das gestaltete Logo ist ein Community-Motiv und keine offizielle Freigabe durch KACO.
+> Unabhängiges Community-Projekt, keine offizielle KACO-Integration. KACO und zugehörige Marken gehören den jeweiligen Rechteinhabern. Das Community-Logo ist keine offizielle Freigabe durch KACO.
 
 ## Funktionen
 
-- Lokale HTTP-Abfrage ohne Cloud über die M11-Kommunikationseinheit (standardmäßig Port `8484`).
-- Konfiguration über **Einstellungen → Geräte & Dienste → Integration hinzufügen**.
-- Messwerte für AC-Leistung, Scheinleistung, Blindleistung, Leistungsfaktor, Tages- und Gesamtertrag, Betriebsstunden, Temperatur, Netzspannung/-strom/-frequenz und PV1/PV2-Spannung/-Strom.
-- Klare Trennung in **Sensoren** und **Diagnose** in Home Assistant.
-- Diagnosewerte für Verbindung, letzte erfolgreiche Aktualisierung, Fehlercode, Nennleistung, Geräteadresse, Ländercode/Netzstandard, Modelltyp und Peak Shaving / Erweiterung.
-- Verständliche Bezeichnungen für bekannte Modellcodes und Ländercodes statt bloßer Zahlenwerte.
-- Zwischenspeicherung der zuletzt erfolgreichen Messdaten und Wiederherstellung nach einem Home-Assistant-Neustart, sobald mindestens eine Messung gespeichert wurde.
-- Keine Schätzung der PV-String-Leistung oder einzelner String-Erträge.
+- Lokale HTTP-Abfrage ohne Cloud über M11 (Standardport `8484`).
+- Einrichtung über **Einstellungen → Geräte & Dienste → Integration hinzufügen**.
+- Automatische Modellerkennung anhand des Seriennummernpräfixes `isn` (z. B. `3.0NX1`, `20.0NX3`), statt anhand des nicht eindeutigen `mty`-Codes.
+- Einphasige Netzwerte für NX1; bei NX3 zusätzliche Netzspannungs- und Netzstromsensoren für L2 und L3, sofern die API die Werte bei der Einrichtung liefert. Bestehende Sensoren `Netzspannung` und `Netzstrom` bleiben aus Kompatibilitätsgründen die L1-Werte.
+- AC-Leistung, Scheinleistung, Blindleistung, Leistungsfaktor, Temperatur, Netzfrequenz, PV1/PV2-Spannung und -Strom, Betriebsstunden, Tages- und Gesamtertrag.
+- Diagnose: Verbindung, letzte erfolgreiche Aktualisierung, Fehlercode, Geräteadresse, Ländercode/Netzstandard, Modelltyp, Nennleistung und Peak Shaving/Erweiterung.
+- Zwischenspeicherung zuletzt erfolgreicher Messwerte über Home-Assistant-Neustarts hinweg.
 
-**Wichtig:** Der Offline-Ersatzwert **0 W** (bzw. **0 VA** für Scheinleistung) ist **keine echte Messung**. Bei einer Netzwerkstörung am Tag kann der Wechselrichter weiterhin Strom erzeugen. Prüfe dafür den Verbindungsstatus. Andere Messwerte behalten bei Verbindungsabbruch ihren letzten empfangenen Stand und können veraltet sein.
+**Wichtig:** Offline-0-W ist **keine echte Messung**. Bei Netzwerkstörungen kann der Wechselrichter weiter erzeugen. PV-String-Leistung und String-Erträge werden **nicht geschätzt**.
 
 ## Voraussetzungen
 
 - Home Assistant mit Unterstützung für benutzerdefinierte Integrationen.
-- KACO blueplanet NX1 M2 mit erreichbarer M11-WLAN-Einheit und lokaler HTTP-Schnittstelle.
-- `http://WECHSELRICHTER-IP:8484/getdev.cgi?device=2` muss eine `inv`-Liste mit `isn` liefern.
-- Home Assistant und Wechselrichter müssen sich im lokalen Netzwerk erreichen können.
+- KACO blueplanet NX1/NX3 mit erreichbarer lokaler M11-HTTP-Schnittstelle.
+- `http://WECHSELRICHTER-IP:8484/getdev.cgi?device=2` muss `inv` mit `isn` liefern.
+- Home Assistant und Kommunikationsmodul müssen sich im Netzwerk erreichen können.
 
-Bisher anhand eines **blueplanet 3.0 NX1 M2 / M11 / Firmware 21618-006R** erprobt. Andere Modelle/Firmwares sind nicht bestätigt. Die vorhandenen NX3-Modellzuordnungen bedeuten **keine bestätigte NX3-Kompatibilität**.
+Bisher getestet: blueplanet 3.0 NX1 M2 / M11 / Firmware `21618-006R`. Ein externer Tester hat für blueplanet 20.0 NX3 M2 passende HTTP-Datensätze bereitgestellt; die aktualisierte Integration selbst muss noch auf diesem Gerät getestet werden.
 
 ## Installation über HACS (benutzerdefiniertes Repository)
 
-1. In Home Assistant **HACS → Drei-Punkte-Menü → Benutzerdefinierte Repositories** öffnen.
-2. Repository-URL `https://github.com/hssteuerung/kaco-local-http` eintragen, Typ **Integration** wählen und hinzufügen.
-3. **KACO Local HTTP** in HACS installieren.
-4. Home Assistant neu starten.
-5. Unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** nach **KACO Local HTTP** suchen.
-6. IP/Hostname und Port eingeben (Standard `8484`).
+1. In **HACS → Drei-Punkte-Menü → Benutzerdefinierte Repositories** öffnen.
+2. `https://github.com/hssteuerung/kaco-local-http` eintragen, Typ **Integration** auswählen.
+3. **KACO Local HTTP** installieren und Home Assistant neu starten.
+4. Unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** nach **KACO Local HTTP** suchen.
+5. IP/Hostname und Port (Standard `8484`) eingeben.
 
-Die genaue Menübezeichnung kann je nach HACS-Version abweichen. **Die Integration ist nicht automatisch im offiziellen HACS-Katalog gelistet.** Das Repository muss dafür auf GitHub veröffentlicht sein.
+Die Menünamen können je nach HACS-Version abweichen. Das Projekt ist nicht automatisch im offiziellen HACS-Katalog gelistet.
 
 ## Manuelle Installation
 
-Den Ordner `custom_components/kaco_local_http` aus diesem Repository nach `/config/custom_components/kaco_local_http` kopieren und Home Assistant neu starten. Danach über **Geräte & Dienste** einrichten.
+`custom_components/kaco_local_http` nach `/config/custom_components/kaco_local_http` kopieren, Home Assistant neu starten und die Integration einrichten.
 
 ## Sensoren und Datenherkunft
 
@@ -53,87 +50,43 @@ Den Ordner `custom_components/kaco_local_http` aus diesem Repository nach `/conf
 |---|---|---|
 | AC-Leistung | `pac` | W; offline Ersatzwert 0 W |
 | Scheinleistung | `sac` | VA; offline Ersatzwert 0 VA |
-| Blindleistung | `qac` | var; Originalwert |
-| Leistungsfaktor | `pf` | `/100`; z. B. `99` → `0,99` |
-| Gesamtertrag Wechselrichter | `eto` | `/10` kWh; mit KACO-App abgeglichen |
-| Tagesertrag | `etd` | `/10` kWh; mit KACO-App abgeglichen |
-| Betriebsstunden | `hto` | h; Originalwert ohne Umrechnung, mit KACO-App abgeglichen |
-| Temperatur | `tmp` | `/10` °C; Skalierung geräteabhängig prüfen |
+| Blindleistung | `qac` | var |
+| Leistungsfaktor | `pf` | `/100` (z. B. 99 → 0,99) |
+| Gesamtertrag | `eto` | `/10` kWh, mit KACO-App am NX1 bestätigt |
+| Tagesertrag | `etd` | `/10` kWh, mit KACO-App am NX1 bestätigt |
+| Betriebsstunden | `hto` | h, ohne Umrechnung; mit KACO-App am NX1 bestätigt |
+| Temperatur | `tmp` | `/10` °C |
 | Netzfrequenz | `fac` | `/100` Hz |
-| Netzspannung | `vac[0]` | `/10` V |
-| Netzstrom | `iac[0]` | `/10` A; Skalierung prüfen |
-| PV1 / PV2 Spannung | `vpv[0]` / `vpv[1]` | `/10` V; Skalierung prüfen |
-| PV1 / PV2 Strom | `ipv[0]` / `ipv[1]` | `/100` A; Skalierung prüfen |
-
-**Hinweis:** Nicht alle Spannungs-, Strom- und Temperatur-Skalierungen wurden unabhängig bestätigt. Vor einer Verwendung für Abrechnung oder Steuerung mit der Original-App vergleichen.
-
-## Diagnose
-
-| Diagnose | HTTP-Feld / Quelle | Anzeige / Bedeutung |
-|---|---|---|
-| Verbindung | HTTP-Erreichbarkeit | Online / Offline |
-| Letzte erfolgreiche Aktualisierung | Lokaler Zeitstempel | Datum/Uhrzeit |
-| Fehlercode | `err` | Originalcode; `0` = kein gemeldeter Fehler |
+| Netzspannung L1 | `vac[0]` | `/10` V; bestehende Entität „Netzspannung“ |
+| Netzspannung L2/L3 | `vac[1]`, `vac[2]` | `/10` V; nur wenn drei Werte geliefert werden |
+| Netzstrom L1 | `iac[0]` | `/10` A; bestehende Entität „Netzstrom“ |
+| Netzstrom L2/L3 | `iac[1]`, `iac[2]` | `/10` A; Skalierung geräteabhängig prüfen |
+| PV1/PV2 Spannung | `vpv[0/1]` | `/10` V |
+| PV1/PV2 Strom | `ipv[0/1]` | `/100` A |
+| Fehlercode | `err` | Originalcode |
+| Ländercode / Netzstandard | `safety` | Zuordnungstabelle, soweit bekannt; keine Schreibfunktion |
+| Modelltyp | `isn` | Modellpräfix aus Seriennummer; `mty` als Attribut `originalcode` |
 | Nennleistung | `rate` | W |
-| Geräteadresse | `add` | Originalwert |
-| Ländercode / Netzstandard | `safety` | Bekannter Code wird in Norm/Land übersetzt |
-| Modelltyp | `mty` | Bekannter Code wird in Modellname übersetzt |
-| Peak Shaving / Erweiterung | `psb_eb` | Originalwert; `1` vermutlich aktiv, Bedeutung nicht abschließend verifiziert |
+| Peak Shaving / Erweiterung | `psb_eb` | Originalwert; genaue Semantik nicht bestätigt |
 
-Der separate **Status-Rohwert `flg`** wird in Version `2026.10.2` nicht mehr als Entität angelegt. `flg` und `psb_eb` sind unterschiedliche HTTP-Felder; ihre Bedeutungen dürfen nicht gleichgesetzt werden.
-
-### Bekannte Ländercodes (`safety`)
-
-Die folgenden Zuordnungen stammen aus einer gerätespezifischen Tabelle und sind nicht für alle Firmwareversionen unabhängig verifiziert.
-
-| Code | Netzstandard / Land |
-|---|---|
-| `70` | VDE-AR-N 4105 (Deutschland) |
-| `71`, `72` | VDE-AR-N 4110 (Deutschland) |
-| `1` | IEC 61727 (International, 50 Hz) |
-| `2` | IEC 61727 (International, 60 Hz) |
-| `10` | EN 50549-1 (Europa) |
-| `14` | CEI 0-21 (Italien) |
-| `20` | TOR Erzeuger (Österreich) |
-| `30` | NA/EEA (Schweiz) |
-| `40` | G98 / G99 (Großbritannien) |
-| `50` | UTE C 15-712-1 (Frankreich) |
-| `80` | UNE / NTS (Spanien) |
-
-Unbekannte Codes werden als solche mit ihrem Originalwert angezeigt.
-
-### Bekannte Modellcodes (`mty`)
-
-| Code | Modell | Code | Modell |
-|---|---|---|---|
-| `47` | blueplanet 1.5 NX1 | `61` | blueplanet 3.0 NX3 M2 |
-| `48` | blueplanet 2.0 NX1 | `62` | blueplanet 4.0 NX3 M2 |
-| `49` | blueplanet 3.0 NX1 | `63` | blueplanet 5.0 NX3 M2 |
-| `50` | blueplanet 3.6 NX1 | `65` | blueplanet 8.0 NX3 M2 |
-| `51` | blueplanet 4.0 NX1 | `66` | blueplanet 10.0 NX3 M2 |
-| `52` | blueplanet 5.0 NX1 | `67` | blueplanet 15.0 NX3 M2 |
-| | | `68` | blueplanet 20.0 NX3 M2 |
+**Hinweis zu NX3:** Der externe 20.0-NX3-Testdatensatz liefert `mty: 51`, obwohl dieser Wert bisher als NX1-Modell interpretiert wurde. `mty` ist deshalb nicht als eindeutige Modellkennung geeignet. Die Zuordnung von Netzstromwerten zu tatsächlichen Ampere ist am NX3 noch nicht unabhängig bestätigt.
 
 ## Datenschutz und Sicherheit
 
-Die Integration fragt die lokale HTTP-Adresse des Geräts ab und benötigt keine Cloud-Zugangsdaten. Die Verbindung ist **unverschlüsseltes HTTP**; nur in einem vertrauenswürdigen lokalen Netz einsetzen und den Port nicht ins Internet freigeben. Bei Fehlermeldungen bitte Registrierungscodes, Tokens und öffentliche IP-Adressen schwärzen.
+Die Integration nutzt die lokale HTTP-Adresse ohne Cloud-Zugangsdaten. HTTP ist **unverschlüsselt**: nur im vertrauenswürdigen LAN verwenden und Port 8484 nicht ins Internet freigeben. Registrierungscodes, Tokens und öffentliche IP-Adressen vor dem Teilen von Logs schwärzen.
 
 ## Fehlerbehebung
 
-- **Nicht gefunden:** IP und Port prüfen; `getdev.cgi?device=2` im lokalen Netz testen.
-- **Sensoren offline:** WLAN-Verbindung und Kommunikationsmodul prüfen; Messwerte bleiben gegebenenfalls gespeichert.
-- **0 W trotz Sonne:** Verbindungsstatus prüfen – bei Offline ist 0 W ein Ersatzwert.
-- **Alte Entitäten noch sichtbar:** Nicht mehr angelegte Entitäten gegebenenfalls unter **Einstellungen → Geräte & Dienste → Entitäten** entfernen.
-- **Logo fehlt:** Home Assistant und HACS verwalten Branding teilweise getrennt; eine Anzeige in allen Ansichten ist nicht garantiert.
-
-## Änderungen
-
-Siehe [CHANGELOG.md](CHANGELOG.md) für die Versionshistorie.
+- **Nicht gefunden:** IP, Port und `getdev.cgi?device=2` prüfen.
+- **Offline:** WLAN/Kommunikationsmodul prüfen; letzte Messwerte bleiben ggf. gespeichert.
+- **0 W trotz Sonne:** Verbindung prüfen; Offline-0-W ist ein Ersatzwert.
+- **NX3 zeigt nur L1:** Prüfen, ob `vac`/`iac` beim Start drei Werte liefern; Home Assistant nach Update neu starten.
+- **Logo fehlt:** Home Assistant und HACS verwalten Branding teilweise separat.
 
 ## Mitwirken
 
-Fehlerberichte bitte mit Home-Assistant-Version, KACO-Modell, M11-Firmware, reproduzierbaren Schritten und anonymisierten Logs einreichen. Siehe [CONTRIBUTING.md](CONTRIBUTING.md).
+Fehlerberichte bitte mit HA-Version, Modell, M11-Firmware, reproduzierbaren Schritten und anonymisierten Logs einreichen. Siehe [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Lizenz
 
-Quellcode unter der [MIT-Lizenz](LICENSE). Marken- und Logo-Rechte bleiben bei den jeweiligen Inhabern; die Lizenz stellt keine Markenfreigabe dar.
+Quellcode unter [MIT-Lizenz](LICENSE). Marken- und Logo-Rechte verbleiben bei ihren Inhabern.

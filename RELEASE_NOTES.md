@@ -1,5 +1,5 @@
-# KACO Local HTTP 2026.10.2
+# KACO Local HTTP 2026.10.3 – Testrelease
 
-Aktuelle Änderungen und vollständige Versionshistorie: [CHANGELOG.md](CHANGELOG.md).
+**Neu:** NX1/NX3-Modellerkennung anhand der Seriennummer, zusätzliche Netzwerte für L2 und L3 bei dreiphasigen Geräten. Der mehrdeutige `mty`-Code wird nur noch als Originalcode gespeichert. Bestehende L1-Entitäts-IDs bleiben erhalten.
 
-Die stabile Veröffentlichung 2026.10.2 trennt Sensoren und Diagnose, zeigt Betriebsstunden in h und Leistungsfaktor als Dezimalwert, enthält Blindleistung und übersetzt bekannte Modell- und Ländercodes. Der Status-Rohwert `flg` wurde als eigenständige Entität entfernt; `psb_eb` bleibt als Diagnose erhalten.
+**Noch offen:** Praxistest auf NX3 und Verifikation der Stromskalierung.

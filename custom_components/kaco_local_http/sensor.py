@@ -22,9 +22,34 @@ DESCRIPTIONS = [
     ('hto','Betriebsstunden','h',SensorDeviceClass.DURATION,SensorStateClass.TOTAL_INCREASING,1),
 ]
 
+def detect_model(serial, rate=None):
+    """Prefer reported serial model prefix, not the ambiguous mty code."""
+    import re
+    match = re.match(r"^(\d+(?:\.\d+)?)\s*(NX[13])", str(serial or ""), re.I)
+    if match:
+        return f"blueplanet {match.group(1)} {match.group(2).upper()} M2"
+    return "blueplanet (Modell nicht erkannt)"
+
+
+def device_info(entry, coordinator):
+    serial = entry.data['serial']
+    data = coordinator.data or {}
+    return DeviceInfo(identifiers={(DOMAIN, serial)}, name=f"KACO {serial}", manufacturer='KACO', model=detect_model(serial, data.get('rate')))
+
+
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator, _, status = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([*(KacoSensor(coordinator, entry, status, *desc) for desc in DESCRIPTIONS), *(KacoDiagnosticSensor(coordinator, entry, status, key, name) for key, name in DIAGNOSTICS), KacoStatusSensor(coordinator, entry, status, "connection"), KacoStatusSensor(coordinator, entry, status, "last_success")])
+    descriptions = list(DESCRIPTIONS)
+    data = coordinator.data or {}
+    for field, name, unit, device_class in (
+        ('vac', 'Netzspannung', 'V', SensorDeviceClass.VOLTAGE),
+        ('iac', 'Netzstrom', 'A', SensorDeviceClass.CURRENT),
+    ):
+        values = data.get(field)
+        if isinstance(values, list):
+            for index in range(1, min(len(values), 3)):
+                descriptions.append((f'{field}{index}', f'{name} L{index+1}', unit, device_class, SensorStateClass.MEASUREMENT, 0.1))
+    async_add_entities([*(KacoSensor(coordinator, entry, status, *desc) for desc in descriptions), *(KacoDiagnosticSensor(coordinator, entry, status, key, name) for key, name in DIAGNOSTICS), KacoStatusSensor(coordinator, entry, status, "connection"), KacoStatusSensor(coordinator, entry, status, "last_success")])
 
 class KacoSensor(CoordinatorEntity, SensorEntity):
     _attr_has_entity_name = True
@@ -39,7 +64,7 @@ class KacoSensor(CoordinatorEntity, SensorEntity):
         self._attr_native_unit_of_measurement = unit
         self._attr_device_class = device_class
         self._attr_state_class = state_class
-        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, entry.data['serial'])}, name=f"KACO {entry.data['serial']}", manufacturer='KACO', model='blueplanet NX1 M2')
+        self._attr_device_info = device_info(entry, coordinator)
 
     @property
     def available(self):
@@ -49,7 +74,7 @@ class KacoSensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self):
         data = self.coordinator.data or {}
-        if self.key.endswith(('0','1')) and self.key.startswith(('vac','iac','vpv','ipv')):
+        if self.key.endswith(('0','1','2')) and self.key.startswith(('vac','iac','vpv','ipv')):
             idx = int(self.key[-1])
             values = data.get(self.key[:-1])
             raw = values[idx] if isinstance(values, list) and len(values) > idx else None
@@ -87,15 +112,8 @@ COUNTRY_CODES = {
     50: "UTE C 15-712-1 (Frankreich)",
     80: "UNE / NTS (Spanien)",
 }
-MODEL_CODES = {
-    47: "blueplanet 1.5 NX1", 48: "blueplanet 2.0 NX1",
-    49: "blueplanet 3.0 NX1", 50: "blueplanet 3.6 NX1",
-    51: "blueplanet 4.0 NX1", 52: "blueplanet 5.0 NX1",
-    61: "blueplanet 3.0 NX3 M2", 62: "blueplanet 4.0 NX3 M2",
-    63: "blueplanet 5.0 NX3 M2", 65: "blueplanet 8.0 NX3 M2",
-    66: "blueplanet 10.0 NX3 M2", 67: "blueplanet 15.0 NX3 M2",
-    68: "blueplanet 20.0 NX3 M2",
-}
+# mty is not a reliable unique model identifier across NX1/NX3.
+# Example: mty=51 observed on a blueplanet 20.0 NX3 M2.
 
 DIAGNOSTICS = [
     ("err", "Fehlercode"),
@@ -112,12 +130,10 @@ class KacoDiagnosticSensor(CoordinatorEntity, SensorEntity):
         super().__init__(coordinator)
         self.status = status
         self.key = key
+        self._model_name = detect_model(entry.data["serial"])
         self._attr_unique_id = f"{entry.data['serial']}_{key}"
         self._attr_name = name
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.data['serial'])},
-            name=f"KACO {entry.data['serial']}", manufacturer="KACO", model="blueplanet NX1 M2",
-        )
+        self._attr_device_info = device_info(entry, coordinator)
         if key == "psb_eb":
             self._attr_icon = "mdi:transmission-tower"
         if key == "rate":
@@ -133,7 +149,7 @@ class KacoDiagnosticSensor(CoordinatorEntity, SensorEntity):
         if self.key == "safety" and raw is not None:
             return COUNTRY_CODES.get(raw, f"Unbekannter Ländercode ({raw})")
         if self.key == "mty" and raw is not None:
-            return MODEL_CODES.get(raw, f"Unbekannter Modelltyp ({raw})")
+            return self._model_name
         return raw
 
     @property
@@ -156,14 +172,11 @@ class KacoStatusSensor(CoordinatorEntity, SensorEntity):
         super().__init__(coordinator)
         self.status = status
         self.key = key
+        self._model_name = detect_model(entry.data["serial"])
         self._attr_unique_id = f"{entry.data['serial']}_{key}"
         self._attr_name = "Verbindung" if key == "connection" else "Letzte erfolgreiche Aktualisierung"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.data['serial'])},
-            name=f"KACO {entry.data['serial']}",
-            manufacturer="KACO", model="blueplanet NX1 M2",
-        )
+        self._attr_device_info = device_info(entry, coordinator)
         if key == "last_success":
             self._attr_device_class = SensorDeviceClass.TIMESTAMP
 
